@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Club de Lectura · Scaling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1F4A;
+    --blue: #185FA5;
+    --bg: #F7F6F3;
+    --white: #FFFFFF;
+    --text: #1A1A2E;
+    --muted: #6B7280;
+    --border: rgba(0,0,0,0.08);
+    --gold: #C8941A;
+    --gold-bg: #FEF8E6;
+
+    --c-estrategia: #185FA5;
+    --c-estrategia-bg: #EBF3FB;
+    --c-personas: #A07800;
+    --c-personas-bg: #FEF8E1;
+    --c-ejecucion: #6B4423;
+    --c-ejecucion-bg: #F5EDE5;
+    --c-caja: #1A7A4A;
+    --c-caja-bg: #E5F5ED;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Filters ── */
+  .filters {
+    background: #fff;
+    padding: 14px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pills-wrap {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .pills-wrap::-webkit-scrollbar { display: none; }
+
+  .pill {
+    flex-shrink: 0;
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--muted);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .pill.active-all { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .pill.active-leido { background: #1A7A4A; color: #fff; border-color: #1A7A4A; }
+  .pill.active-leyendo { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .pill.active-porleer { background: #6B4423; color: #fff; border-color: #6B4423; }
+
+  /* ── Cards grid ── */
+  .cards-wrap {
+    padding: 20px 16px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 600px) {
+    .cards-wrap { padding: 24px 24px 48px; }
+    .filters { padding: 16px 24px; }
+  }
+
+  .book-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: box-shadow 0.18s;
+  }
+  .book-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+
+  .card-body {
+    padding: 18px 20px 14px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .book-spine {
+    flex-shrink: 0;
+    width: 44px;
+    height: 60px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .spine-E { background: var(--c-estrategia-bg); color: var(--c-estrategia); }
+  .spine-P { background: var(--c-personas-bg); color: var(--c-personas); }
+  .spine-X { background: var(--c-ejecucion-bg); color: var(--c-ejecucion); }
+  .spine-C { background: var(--c-caja-bg); color: var(--c-caja); }
+
+  .card-main { flex: 1; min-width: 0; }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .decision-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .badge-E { background: var(--c-estrategia-bg); color: var(--c-estrategia); }
+  .badge-P { background: var(--c-personas-bg); color: var(--c-personas); }
+  .badge-X { background: var(--c-ejecucion-bg); color: var(--c-ejecucion); }
+  .badge-C { background: var(--c-caja-bg); color: var(--c-caja); }
+
+  .sesion-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .book-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 3px;
+  }
+
+  .book-author {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .book-resumen {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.6;
+  }
+
+  .card-footer {
+    border-top: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .fecha-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* ── Stars ── */
+  .stars-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  .star {
+    font-size: 16px;
+    cursor: pointer;
+    color: #D1D5DB;
+    transition: color 0.1s, transform 0.1s;
+    line-height: 1;
+    user-select: none;
+  }
+  .star.filled { color: var(--gold); }
+  .star:hover { transform: scale(1.2); }
+
+  .avg-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 28px;
+  }
+
+  /* ── PDF button ── */
+  .pdf-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--blue);
+    background: var(--c-estrategia-bg);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .pdf-btn:hover { background: #D5E8F7; }
+  .pdf-btn.no-pdf { color: var(--muted); background: #F3F4F6; cursor: default; }
+
+  /* ── Estado badge ── */
+  .estado-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .estado-leido { background: #E5F5ED; color: #1A7A4A; }
+  .estado-leyendo { background: #EBF3FB; color: #185FA5; }
+  .estado-porleer { background: #F5EDE5; color: #6B4423; }
+
+  /* ── Loading / Empty ── */
+  .loading-msg {
+    text-align: center;
+    padding: 48px 16px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* ── Nombre modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.visible { display: flex; }
+
+  .modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+  }
+
+  .modal-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .modal-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .modal-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    margin-bottom: 14px;
+    transition: border-color 0.2s;
+  }
+  .modal-input:focus { border-color: var(--blue); }
+
+  .modal-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .modal-btn:hover { opacity: 0.9; }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--bg);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  .user-chip-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #1A7A4A;
+  }
+
+  .top-bar {
+    background: #fff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .top-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--text);
+  }
+
+  @media (min-width: 600px) {
+    .top-bar { padding: 14px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MODAL nombre -->
+<div class="modal-overlay visible" id="modal">
+  <div class="modal">
+    <div class="modal-title">¡Hola!</div>
+    <div class="modal-sub">Ingresa tu nombre para poder guardar tu valoración de cada lectura.</div>
+    <input class="modal-input" type="text" id="nombre-input" placeholder="Tu nombre…" maxlength="40">
+    <button class="modal-btn" onclick="guardarNombre()">Entrar al Club de Lectura</button>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar" style="justify-content:flex-end">
+  <div class="user-chip" id="user-chip" onclick="cambiarNombre()" style="display:none">
+    <div class="user-chip-dot"></div>
+    <span id="user-chip-name"></span>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <div class="pills-wrap">
+    <div class="pill active-all" onclick="filtrar('all', this)">Todas</div>
+    <div class="pill" onclick="filtrar('Leído', this)">Leídas</div>
+    <div class="pill" onclick="filtrar('Leyendo', this)">Leyendo</div>
+    <div class="pill" onclick="filtrar('Por leer', this)">Por leer</div>
+  </div>
+</div>
+
+<!-- CARDS -->
+<div class="cards-wrap" id="cards-wrap">
+  <div class="loading-msg">Cargando lecturas…</div>
+</div>
+
+<script>
+// ── CONFIGURACIÓN ──
+// Reemplaza esta URL con la de tu Google Sheet publicada como CSV
+// Formato: https://docs.google.com/spreadsheets/d/ID/gviz/tq?tqx=out:csv&sheet=Hoja1
+const SHEET_ID = '1N0Ntkggik3HgiFxj5FA1XnsP17mOBkrkat-CxpPabSY';
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Hoja1`;
+
+// ── DATOS DE LECTURAS ──
+const lecturas = [
+  { id: 1, sesion: 1, decision: 'Estrategia', nombre: 'What is Strategy', autor: 'Michael Porter, HBR', resumen: 'Estrategia bajada a actividades: fundamental para actividades diferenciadoras.', fecha: '18 de marzo', estado: 'Leído', pdf: 'https://scaling10x.sharepoint.com/:b:/s/Scaling/IQC6nGP29QNQT5Y7Nj3vFb91AS1ZLPbkPUJriIHvh7T-LQ8?e=SESmlf' },
+  { id: 2, sesion: 2, decision: 'Estrategia', nombre: "Building Your Company's Vision", autor: 'Jim Collins, HBR', resumen: 'Cómo construir valores y BHAG.', fecha: '28 de abril', estado: 'Leyendo', pdf: 'https://scaling10x.sharepoint.com/:b:/s/Scaling/IQAN6G_kwykKQq_afP2PixYaAU4vjtK4CF7VZu2kvZcj0jw?e=6Vffgt' },
+  { id: 3, sesion: 2, decision: 'Estrategia', nombre: 'Empieza por el por qué', autor: 'Simon Sinek', resumen: 'Propósito.', fecha: '28 de abril', estado: 'Leyendo', pdf: 'https://scaling10x.sharepoint.com/:b:/s/Scaling/IQB8M3V9ufMeRqGRQ7smtmAmATIr5jPjRxxgTHCmDwFWAac?e=x5zWn0' },
+  { id: 4, sesion: 2, decision: 'Estrategia', nombre: 'Valores fundamentales', autor: 'Forbes', resumen: 'Importancia valores fundamentales de una empresa.', fecha: '28 de abril', estado: 'Leyendo', pdf: 'https://scaling10x.sharepoint.com/:b:/s/Scaling/IQBkdsCjKWsXTZMtYq5x6Go9AcQbJmuSMmpfaxbtCQl_fEI?e=e4B6Kg' },
+  { id: 5, sesion: 3, decision: 'Estrategia', nombre: 'Good to Great', autor: 'Jim Collins', resumen: '13 ejemplos y muchas herramientas como Hedgehog concept y BHAG.', fecha: '26 de mayo', estado: 'Por leer', pdf: '' },
+  { id: 6, sesion: 4, decision: 'Estrategia', nombre: 'Jugar a Ganar: Cómo funciona realmente la estrategia', autor: 'AG Lafley', resumen: 'Estrategia para grandes corporaciones con unidades de negocios.', fecha: '30 de junio', estado: 'Por leer', pdf: '' },
+  { id: 7, sesion: 5, decision: 'Estrategia', nombre: 'Uncommon Service', autor: 'Frances Frei', resumen: 'Fundamental para Estrategia en una frase y promesa de marca: no se puede ser bueno en todo.', fecha: '28 de julio', estado: 'Por leer', pdf: '' },
+  { id: 8, sesion: 6, decision: 'Personas', nombre: 'The Advantage', autor: 'Patrick Lencioni', resumen: 'Explica cohesión de equipo y el rol de la estrategia (6 preguntas).', fecha: '25 de agosto', estado: 'Por leer', pdf: '' },
+  { id: 9, sesion: 7, decision: 'Personas', nombre: '5 Disfunciones de un Equipo', autor: 'Patrick Lencioni', resumen: 'Clave para la efectividad de equipo.', fecha: '29 de septiembre', estado: 'Por leer', pdf: '' },
+  { id: 10, sesion: 8, decision: 'Personas', nombre: 'Multipliers', autor: 'Liz Wiseman', resumen: 'Liderazgo multiplicador.', fecha: '27 de octubre', estado: 'Por leer', pdf: '' },
+  { id: 11, sesion: 9, decision: 'Estrategia', nombre: 'Turning the Flywheel', autor: 'Jim Collins', resumen: 'Profundiza el concepto de flywheel: cada empujón acelera el volante y con el tiempo el impulso se vuelve imparable.', fecha: '24 de noviembre', estado: 'Por leer', pdf: '' },
+];
+
+// Solo mostrar las que tienen estado (Leído o Leyendo)
+const lecturasVisibles = lecturas;
+
+let currentFilter = 'all';
+let userName = localStorage.getItem('scaling_user') || '';
+let votaciones = {}; // { lectura_id: { promedio, totalVotos, miVoto } }
+
+const decisionMap = {
+  'Estrategia': 'E',
+  'Personas': 'P',
+  'Ejecución': 'X',
+  'Caja': 'C'
+};
+
+// ── NOMBRE ──
+function guardarNombre() {
+  const input = document.getElementById('nombre-input').value.trim();
+  if (!input) return;
+  userName = input;
+  localStorage.setItem('scaling_user', userName);
+  document.getElementById('modal').classList.remove('visible');
+  document.getElementById('user-chip').style.display = 'flex';
+  document.getElementById('user-chip-name').textContent = userName;
+  cargarVotaciones();
+}
+
+function cambiarNombre() {
+  localStorage.removeItem('scaling_user');
+  userName = '';
+  document.getElementById('modal').classList.add('visible');
+  document.getElementById('user-chip').style.display = 'none';
+  document.getElementById('nombre-input').value = '';
+}
+
+document.getElementById('nombre-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') guardarNombre();
+});
+
+// ── VOTACIONES via Google Sheets ──
+async function cargarVotaciones() {
+  try {
+    const url = SHEET_CSV_URL;
+    const res = await fetch(url);
+    const text = await res.text();
+    const rows = text.trim().split('\n').slice(1); // skip header
+
+    const votos = {};
+    rows.forEach(row => {
+      const cols = row.split(',').map(c => c.replace(/^"|"$/g, '').trim());
+      const [lid, usuario, estrellas] = cols;
+      const id = parseInt(lid);
+      const stars = parseInt(estrellas);
+      if (!id || !stars) return;
+      if (!votos[id]) votos[id] = { suma: 0, count: 0, miVoto: 0 };
+      votos[id].suma += stars;
+      votos[id].count += 1;
+      if (usuario === userName) votos[id].miVoto = stars;
+    });
+
+    Object.keys(votos).forEach(id => {
+      const v = votos[id];
+      votaciones[id] = {
+        promedio: v.count > 0 ? (v.suma / v.count).toFixed(1) : '—',
+        totalVotos: v.count,
+        miVoto: v.miVoto
+      };
+    });
+  } catch(e) {
+    // Si no hay sheet configurado, seguir sin votaciones
+  }
+  renderCards();
+}
+
+async function votar(lecturaId, estrellas) {
+  if (!userName) return;
+  const url = `https://docs.google.com/forms/d/e/REEMPLAZAR_FORM_ID/formResponse`;
+  // Usamos fetch a la sheet directamente via append
+  try {
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Hoja1:append?valueInputOption=USER_ENTERED`, {
+      method: 'POST',
+      body: JSON.stringify({ values: [[lecturaId, userName, estrellas, new Date().toISOString()]] })
+    });
+  } catch(e) {}
+
+  // Actualizar localmente
+  if (!votaciones[lecturaId]) votaciones[lecturaId] = { promedio: estrellas, totalVotos: 1, miVoto: estrellas };
+  else {
+    votaciones[lecturaId].miVoto = estrellas;
+  }
+  renderCard(lecturaId);
+}
+
+// ── RENDER ──
+function getVisible() {
+  if (currentFilter === 'all') return lecturasVisibles;
+  return lecturasVisibles.filter(l => l.estado === currentFilter);
+}
+
+function renderCards() {
+  const wrap = document.getElementById('cards-wrap');
+  const visible = getVisible();
+  if (visible.length === 0) {
+    wrap.innerHTML = '<div class="loading-msg">No hay lecturas en esta categoría.</div>';
+    return;
+  }
+  wrap.innerHTML = visible.map(l => cardHTML(l)).join('');
+}
+
+function renderCard(lecturaId) {
+  const card = document.querySelector(`[data-id="${lecturaId}"]`);
+  if (!card) return;
+  const l = lecturas.find(x => x.id === lecturaId);
+  if (!l) return;
+  card.outerHTML = cardHTML(l);
+}
+
+function cardHTML(l) {
+  const cat = decisionMap[l.decision] || 'E';
+  const v = votaciones[l.id] || { promedio: '—', totalVotos: 0, miVoto: 0 };
+  const miVoto = v.miVoto || 0;
+
+  const estrellas = [1,2,3,4,5].map(n =>
+    `<span class="star ${n <= miVoto ? 'filled' : ''}" onclick="handleVoto(${l.id}, ${n})">★</span>`
+  ).join('');
+
+  const pdfBtn = l.pdf
+    ? `<a href="${l.pdf}" target="_blank" class="pdf-btn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 6h4M6 4v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Ver PDF</a>`
+    : `<span class="pdf-btn no-pdf">Sin PDF</span>`;
+
+  const estadoBadge = l.estado === 'Leído'
+    ? `<span class="estado-badge estado-leido">Leída</span>`
+    : l.estado === 'Por leer'
+    ? `<span class="estado-badge estado-porleer">Por leer</span>`
+    : `<span class="estado-badge estado-leyendo">Leyendo</span>`;
+
+  return `
+  <div class="book-card" data-id="${l.id}" data-estado="${l.estado}">
+    <div class="card-body">
+      <div class="book-spine spine-${cat}">${cat}${l.sesion}</div>
+      <div class="card-main">
+        <div class="card-meta">
+          <span class="decision-badge badge-${cat}">${l.decision}</span>
+          <span class="sesion-num">Sesión ${l.sesion}</span>
+          ${estadoBadge}
+        </div>
+        <div class="book-title">${l.nombre}</div>
+        <div class="book-author">${l.autor}</div>
+        <div class="book-resumen">${l.resumen}</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="fecha-tag">${l.fecha}</span>
+      <div class="footer-right">
+        <div class="stars-wrap">
+          <div class="stars">${estrellas}</div>
+          <span class="avg-label">${v.promedio !== '—' ? v.promedio : '—'} ${v.totalVotos > 0 ? '(' + v.totalVotos + ')' : ''}</span>
+        </div>
+        ${pdfBtn}
+      </div>
+    </div>
+  </div>`;
+}
+
+function handleVoto(lecturaId, estrellas) {
+  if (!userName) {
+    document.getElementById('modal').classList.add('visible');
+    return;
+  }
+  // Actualizar UI inmediatamente
+  if (!votaciones[lecturaId]) votaciones[lecturaId] = { promedio: estrellas, totalVotos: 1, miVoto: estrellas };
+  else votaciones[lecturaId].miVoto = estrellas;
+
+  // Guardar en sheet
+  guardarVotoSheet(lecturaId, estrellas);
+  renderCards();
+}
+
+async function guardarVotoSheet(lecturaId, estrellas) {
+  // Append a Google Sheet via fetch (requiere que el sheet esté configurado)
+  const fecha = new Date().toLocaleDateString('es-CL');
+  const row = [lecturaId, userName, estrellas, fecha];
+  try {
+    await fetch(`https://script.google.com/macros/s/AKfycbzz6Inr2ml4kamb8DaPa9pi-SibVYAyPQwvBnESDj930ZGzue8r6_wdh3SrhMvdOpwV8g/exec`, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lectura_id: lecturaId, usuario: userName, estrellas, fecha })
+    });
+  } catch(e) {}
+}
+
+function filtrar(estado, el) {
+  currentFilter = estado;
+  document.querySelectorAll('.pill').forEach(p => {
+    p.className = 'pill';
+  });
+  if (estado === 'all') el.classList.add('active-all');
+  else if (estado === 'Leído') el.classList.add('active-leido');
+  else if (estado === 'Por leer') el.classList.add('active-porleer');
+  else el.classList.add('active-leyendo');
+  renderCards();
+}
+
+// ── INIT ──
+if (userName) {
+  document.getElementById('modal').classList.remove('visible');
+  document.getElementById('user-chip').style.display = 'flex';
+  document.getElementById('user-chip-name').textContent = userName;
+  cargarVotaciones();
+} else {
+  renderCards();
+}
+</script>
+</body>
+</html>
