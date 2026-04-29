@@ -473,24 +473,19 @@ document.getElementById('nombre-input').addEventListener('keydown', e => {
 // ── VOTACIONES via Google Sheets ──
 async function cargarVotaciones() {
   try {
-    const url = SHEET_CSV_URL;
+    const url = 'https://script.google.com/macros/s/AKfycbykUdsWpPguUtJmvFY4OueDcdP0fIHGmcu1IF7S0rk8XKbX1BuR684pVgW5VWOzQvQm3Q/exec';
     const res = await fetch(url);
-    const text = await res.text();
-    const rows = text.trim().split('\n').slice(1); // skip header
-
+    const data = await res.json();
     const votos = {};
-    rows.forEach(row => {
-      const cols = row.split(',').map(c => c.replace(/^"|"$/g, '').trim());
-      const [lid, usuario, estrellas] = cols;
-      const id = parseInt(lid);
-      const stars = parseInt(estrellas);
+    data.forEach(row => {
+      const id = parseInt(row.lectura_id);
+      const stars = parseInt(row.estrellas);
       if (!id || !stars) return;
       if (!votos[id]) votos[id] = { suma: 0, count: 0, miVoto: 0 };
       votos[id].suma += stars;
       votos[id].count += 1;
-      if (usuario === userName) votos[id].miVoto = stars;
+      if (row.usuario === userName) votos[id].miVoto = stars;
     });
-
     Object.keys(votos).forEach(id => {
       const v = votos[id];
       votaciones[id] = {
@@ -499,9 +494,7 @@ async function cargarVotaciones() {
         miVoto: v.miVoto
       };
     });
-  } catch(e) {
-    // Si no hay sheet configurado, seguir sin votaciones
-  }
+  } catch(e) {}
   renderCards();
 }
 
@@ -611,18 +604,13 @@ function handleVoto(lecturaId, estrellas) {
 
 async function guardarVotoSheet(lecturaId, estrellas) {
   const fecha = new Date().toLocaleDateString('es-CL');
-  const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSenjC1C4EllF0MdVk6WyyEczteT8-UiGtjrhCVAEt8sgecrLg/formResponse';
-  const params = new URLSearchParams();
-  params.append('entry.2008192860', lecturaId);
-  params.append('entry.53259828', userName);
-  params.append('entry.793687496', estrellas);
-  params.append('entry.339078922', fecha);
+  const url = 'https://script.google.com/macros/s/AKfycbykUdsWpPguUtJmvFY4OueDcdP0fIHGmcu1IF7S0rk8XKbX1BuR684pVgW5VWOzQvQm3Q/exec';
   try {
-    await fetch(formUrl, {
+    await fetch(url, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString()
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lectura_id: lecturaId, usuario: userName, estrellas, fecha })
     });
   } catch(e) {}
 }
