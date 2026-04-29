@@ -611,7 +611,7 @@ function handleVoto(lecturaId, estrellas) {
 
 async function guardarVotoSheet(lecturaId, estrellas) {
   const fecha = new Date().toLocaleDateString('es-CL');
-  const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSenjC1C4ElIF0MdVk6WyyEczteT8-UiGtjrhCVAEt8sgecrLg/formResponse';
+  const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSenjC1C4EllF0MdVk6WyyEczteT8-UiGtjrhCVAEt8sgecrLg/formResponse';
   const params = new URLSearchParams();
   params.append('entry.2008192860', lecturaId);
   params.append('entry.53259828', userName);
