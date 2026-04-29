@@ -399,8 +399,7 @@
 <!-- FILTERS -->
 <div class="filters">
   <div class="pills-wrap">
-    <div class="pill active-all" onclick="filtrar('all', this)">Todas</div>
-    <div class="pill" onclick="filtrar('Leído', this)">Leídas</div>
+    <div class="pill active-leido" onclick="filtrar('Leído', this)">Leídas</div>
     <div class="pill" onclick="filtrar('Leyendo', this)">Leyendo</div>
     <div class="pill" onclick="filtrar('Por leer', this)">Por leer</div>
   </div>
@@ -436,7 +435,7 @@ const lecturas = [
 // Solo mostrar las que tienen estado (Leído o Leyendo)
 const lecturasVisibles = lecturas;
 
-let currentFilter = 'all';
+let currentFilter = 'Leído';
 let userName = localStorage.getItem('scaling_user') || '';
 let votaciones = {}; // { lectura_id: { promedio, totalVotos, miVoto } }
 
@@ -584,7 +583,7 @@ function cardHTML(l) {
       </div>
     </div>
     <div class="card-footer">
-      <span class="fecha-tag">${l.fecha}</span>
+      <span class="fecha-tag">Fecha Club de Lectura: ${l.fecha}</span>
       <div class="footer-right">
         <div class="stars-wrap">
           <div class="stars">${estrellas}</div>
@@ -615,7 +614,7 @@ async function guardarVotoSheet(lecturaId, estrellas) {
   const fecha = new Date().toLocaleDateString('es-CL');
   const row = [lecturaId, userName, estrellas, fecha];
   try {
-    await fetch(`https://script.google.com/macros/s/AKfycbzz6Inr2ml4kamb8DaPa9pi-SibVYAyPQwvBnESDj930ZGzue8r6_wdh3SrhMvdOpwV8g/exec`, {
+    await fetch(`https://script.google.com/macros/s/AKfycbykUdsWpPguUtJmvFY4OueDcdP0fIHGmcu1IF7S0rk8XKbX1BuR684pVgW5VWOzQvQm3Q/exec`, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
@@ -629,8 +628,7 @@ function filtrar(estado, el) {
   document.querySelectorAll('.pill').forEach(p => {
     p.className = 'pill';
   });
-  if (estado === 'all') el.classList.add('active-all');
-  else if (estado === 'Leído') el.classList.add('active-leido');
+  if (estado === 'Leído') el.classList.add('active-leido');
   else if (estado === 'Por leer') el.classList.add('active-porleer');
   else el.classList.add('active-leyendo');
   renderCards();
