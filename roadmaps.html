@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmaps · Scaling</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1F4A;
+    --blue: #185FA5;
+    --text: #1A1A2E;
+    --muted: #6B7280;
+    --border: #E5E7EB;
+    --c-E: #185FA5; --bg-E: #EBF3FB;
+    --c-P: #A07800; --bg-P: #FEF8E1;
+    --c-X: #6B4423; --bg-X: #F5EDE5;
+    --c-C: #1A7A4A; --bg-C: #E5F5ED;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito Sans', sans-serif; background: #fff; color: var(--text); -webkit-font-smoothing: antialiased; font-size: 13px; }
+
+  .tabs-wrap { display: flex; border-bottom: 2px solid var(--border); padding: 0 16px; overflow-x: auto; scrollbar-width: none; background: #fff; position: sticky; top: 0; z-index: 10; }
+  .tabs-wrap::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 12px 18px; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color 0.15s, border-color 0.15s; display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .tab-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .tab.active-E { color: var(--c-E); border-bottom-color: var(--c-E); }
+  .tab.active-P { color: var(--c-P); border-bottom-color: var(--c-P); }
+  .tab.active-X { color: var(--c-X); border-bottom-color: var(--c-X); }
+  .tab.active-C { color: var(--c-C); border-bottom-color: var(--c-C); }
+
+  .panel { display: none; padding: 16px; }
+  .panel.active { display: block; }
+
+  .idea-clave { border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; font-size: 12px; line-height: 1.6; border-left: 3px solid; }
+  .idea-E { background: var(--bg-E); border-color: var(--c-E); }
+  .idea-P { background: var(--bg-P); border-color: var(--c-P); }
+  .idea-X { background: var(--bg-X); border-color: var(--c-X); }
+  .idea-C { background: var(--bg-C); border-color: var(--c-C); }
+  .idea-label { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3px; }
+  .idea-text { color: var(--text); }
+
+  .leyenda { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; padding: 10px 14px; background: #F9FAFB; border-radius: 8px; border: 1px solid var(--border); }
+  .leyenda-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); font-weight: 600; }
+
+  .ico { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; line-height: 1; }
+  .ico-esencial { background: #2E9E5B; color: #fff; }
+  .ico-probable { background: #185FA5; color: #fff; }
+  .ico-depende  { background: #F5A623; color: #fff; }
+  .ico-revisar  { background: #fff; color: #185FA5; border: 2px solid #185FA5; font-size: 13px; font-weight: 800; }
+
+  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  thead tr { background: var(--navy); }
+  thead th { padding: 10px 8px; font-size: 12px; font-weight: 700; color: #fff; text-align: center; border-right: 1px solid rgba(255,255,255,0.1); }
+  thead th:first-child { text-align: left; padding-left: 14px; width: 44px; }
+  thead th:nth-child(2) { text-align: left; padding-left: 10px; }
+  thead th:last-child { border-right: none; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover:not(.grupo-row) { background: #F9FAFB; }
+  tbody td { padding: 8px 8px; font-size: 12px; color: var(--text); text-align: center; border-right: 1px solid var(--border); vertical-align: middle; }
+  tbody td:first-child { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); padding-left: 14px; width: 44px; }
+  tbody td:nth-child(2) { text-align: left; padding-left: 10px; font-weight: 600; min-width: 180px; }
+  tbody td:last-child { border-right: none; }
+  .grupo-row td { background: #F3F4F6; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 7px 14px; text-align: left !important; }
+  .icon-cell { display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+
+<div class="tabs-wrap">
+  <div class="tab active-E" onclick="switchTab('E',this)"><div class="tab-dot" style="background:var(--c-E)"></div>Estrategia</div>
+  <div class="tab" onclick="switchTab('P',this)"><div class="tab-dot" style="background:var(--c-P)"></div>Personas</div>
+  <div class="tab" onclick="switchTab('X',this)"><div class="tab-dot" style="background:var(--c-X)"></div>Ejecución</div>
+  <div class="tab" onclick="switchTab('C',this)"><div class="tab-dot" style="background:var(--c-C)"></div>Caja</div>
+</div>
+
+<!-- ESTRATEGIA -->
+<div class="panel active" id="panel-E">
+  <div class="idea-clave idea-E">
+    <div class="idea-label" style="color:var(--c-E)">Idea clave</div>
+    <div class="idea-text">La estrategia nunca se termina: es un proceso vivo que debe revisarse y actualizarse constantemente para asegurar su vigencia, coherencia y dirección frente a un entorno cambiante.</div>
+  </div>
+  <div class="leyenda">
+    <div class="leyenda-item"><span class="ico ico-esencial">✓</span>Esencial — Contenido base para lograr impacto</div>
+    <div class="leyenda-item"><span class="ico ico-probable">✓</span>Probable — Eventualmente se hace, determinar cuándo</div>
+    <div class="leyenda-item"><span class="ico ico-depende">?</span>Depende — Solo si el coach lo considera necesario y lo aprueba con el cliente</div>
+    <div class="leyenda-item"><span class="ico ico-revisar">R</span>Revisar — Reevaluar y actualizar (continuidad)</div>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>N°</th><th>Building Block</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>S6</th><th>S7</th><th>S8</th></tr></thead>
+    <tbody>
+      <tr class="grupo-row"><td colspan="10">Cultura</td></tr>
+      <tr><td>1</td><td>Propósito y valores</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>2</td><td>Fortaleza central</td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>3</td><td>Valores Dos and don'ts</td><td></td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td></tr>
+      <tr><td>4</td><td>Acciones para vivir el propósito</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="grupo-row"><td colspan="10">Modelo de negocios</td></tr>
+      <tr><td>5</td><td>Territorio de mercado</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>6</td><td>Cliente principal y promesa de marca</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>7</td><td>Estrategia en una frase</td><td></td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>8</td><td>Actividades diferenciadoras</td><td></td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>9</td><td>Resumen modelo de negocios</td><td></td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>10</td><td>Factor X</td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td></tr>
+      <tr><td>11</td><td>Flywheel</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>12</td><td>Atributos de marca</td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>13</td><td>Palabras que te pertenecen</td><td></td><td></td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-depende">?</span></div></td><td></td><td></td></tr>
+      <tr><td>14</td><td>Job to be done</td><td></td><td></td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td></tr>
+      <tr class="grupo-row"><td colspan="10">Visión</td></tr>
+      <tr><td>15</td><td>Profit / X</td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>16</td><td>BHAG</td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- PERSONAS -->
+<div class="panel" id="panel-P">
+  <div class="idea-clave idea-P">
+    <div class="idea-label" style="color:var(--c-P)">Idea clave</div>
+    <div class="idea-text">Las personas son el eje de la estrategia. Los equipos evolucionan, cambian y se transforman; por eso, su gestión es una agenda permanente que nunca puede quedar atrás.</div>
+  </div>
+  <div class="leyenda">
+    <div class="leyenda-item"><span class="ico ico-esencial">✓</span>Esencial — Contenido base para lograr impacto</div>
+    <div class="leyenda-item"><span class="ico ico-probable">✓</span>Probable — Eventualmente se hace, determinar cuándo</div>
+    <div class="leyenda-item"><span class="ico ico-depende">?</span>Depende — Solo si el coach lo considera necesario y lo aprueba con el cliente</div>
+    <div class="leyenda-item"><span class="ico ico-revisar">R</span>Revisar — Reevaluar y actualizar (continuidad)</div>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>N°</th><th>Building Block</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>S6</th><th>S7</th><th>S8</th></tr></thead>
+    <tbody>
+      <tr class="grupo-row"><td colspan="10">Personas correctas</td></tr>
+      <tr><td>1</td><td>Diagnóstico de efectividad de equipo</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>2</td><td>Tipos de personalidad</td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>3</td><td>Mapa de talentos</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>4</td><td>Top Grading</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>5</td><td>Ejercicios de confianza</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>6</td><td>Feedback in your face</td><td></td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>7</td><td>Ejercicios de compromiso</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>8</td><td>Ejercicios de conflicto</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>9</td><td>Ejercicio de comunicación</td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-depende">?</span></div></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="grupo-row"><td colspan="10">Asientos correctos</td></tr>
+      <tr><td>10</td><td>FACe: Funciones claras</td><td></td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>11</td><td>PACe: Procesos claros</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>12</td><td>Plan personal y propósito</td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-depende">?</span></div></td><td></td><td></td><td></td><td></td></tr>
+      <tr class="grupo-row"><td colspan="10">Haciendo lo correcto</td></tr>
+      <tr><td>13</td><td>Liderazgo: GROW</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>14</td><td>Liderazgo: Feedback</td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td></tr>
+      <tr><td>15</td><td>Liderazgo: Accountability</td><td></td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td></tr>
+      <tr><td>16</td><td>Reconocimiento estratégico</td><td></td><td></td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- EJECUCIÓN -->
+<div class="panel" id="panel-X">
+  <div class="idea-clave idea-X">
+    <div class="idea-label" style="color:var(--c-X)">Idea clave</div>
+    <div class="idea-text">La ejecución es iterativa: un proceso de entrenamiento constante que exige innovación para sostener resultados y adaptarse al cambio.</div>
+  </div>
+  <div class="leyenda">
+    <div class="leyenda-item"><span class="ico ico-esencial">✓</span>Esencial — Contenido base para lograr impacto</div>
+    <div class="leyenda-item"><span class="ico ico-probable">✓</span>Probable — Eventualmente se hace, determinar cuándo</div>
+    <div class="leyenda-item"><span class="ico ico-depende">?</span>Depende — Solo si el coach lo considera necesario y lo aprueba con el cliente</div>
+    <div class="leyenda-item"><span class="ico ico-revisar">R</span>Revisar — Reevaluar y actualizar (continuidad)</div>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>N°</th><th>Building Block</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>S6</th><th>S7</th><th>S8</th></tr></thead>
+    <tbody>
+      <tr><td>Ej1</td><td>Training Hábitos de ejecución</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Ej2</td><td>Training KPIs diarios y semanales</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Ej3</td><td>Taller Productividad personal</td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Ej4</td><td>Encuesta 10 hábitos</td><td></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Ej5</td><td>Venta consultiva</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-depende">?</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Ej6</td><td>Empezar, Parar, Continuar</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Ej7</td><td>Pits / Velero</td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>Ej8</td><td>Priorizar en base al Flywheel</td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- CAJA -->
+<div class="panel" id="panel-C">
+  <div class="idea-clave idea-C">
+    <div class="idea-label" style="color:var(--c-C)">Idea clave</div>
+    <div class="idea-text">La caja es la base operativa de todo. Mantenerla presente y gestionarla con rigor es clave. Es un ítem fundamental que nunca debe quedar de lado.</div>
+  </div>
+  <div class="leyenda">
+    <div class="leyenda-item"><span class="ico ico-esencial">✓</span>Esencial — Contenido base para lograr impacto</div>
+    <div class="leyenda-item"><span class="ico ico-probable">✓</span>Probable — Eventualmente se hace, determinar cuándo</div>
+    <div class="leyenda-item"><span class="ico ico-depende">?</span>Depende — Solo si el coach lo considera necesario y lo aprueba con el cliente</div>
+    <div class="leyenda-item"><span class="ico ico-revisar">R</span>Revisar — Reevaluar y actualizar (continuidad)</div>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>N°</th><th>Building Block</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>S6</th><th>S7</th><th>S8</th></tr></thead>
+    <tbody>
+      <tr><td>C1</td><td>Nuggets de caja</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>C2</td><td>Introducción a caja</td><td><div class="icon-cell"><span class="ico ico-esencial">✓</span></div></td><td><div class="icon-cell"><span class="ico ico-revisar">R</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>C3</td><td>Ciclo de conversión de dinero</td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>C4</td><td>Poder de 1 y 7 palancas</td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-probable">✓</span></div></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>C5</td><td>Estrategia de precios</td><td></td><td></td><td></td><td><div class="icon-cell"><span class="ico ico-depende">?</span></div></td><td></td><td></td><td></td><td></td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<script>
+function switchTab(cat, el) {
+  document.querySelectorAll('.tab').forEach(t => t.className = 'tab');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active-' + cat);
+  document.getElementById('panel-' + cat).classList.add('active');
+}
+</script>
+</body>
+</html>
